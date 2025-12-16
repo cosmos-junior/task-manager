@@ -105,7 +105,45 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Authentication URLs
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+# Email settings - Using console backend for testing
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Time Manager <noreply@timemanager.com>'
+
+# Twilio settings for SMS
+TWILIO_ACCOUNT_SID = 'your-twilio-account-sid'  # Replace with your Twilio SID
+TWILIO_AUTH_TOKEN = 'your-twilio-auth-token'  # Replace with your Twilio token
+TWILIO_PHONE_NUMBER = '+1234567890'  # Replace with your Twilio phone number
+
+# Firebase Cloud Messaging for push notifications
+FCM_SERVER_KEY = 'your-fcm-server-key'  # Replace with your FCM server key
+
+# Site URL for links in notifications
+SITE_URL = 'http://127.0.0.1:8000'
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'reminders.log',
+        },
+    },
+    'loggers': {
+        'tasks.services': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}

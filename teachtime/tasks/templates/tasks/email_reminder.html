@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Task Reminder</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
+        .task-section { margin: 20px 0; }
+        .task-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #667eea; }
+        .task-item.high { border-left-color: #ef4444; }
+        .task-item.medium { border-left-color: #f59e0b; }
+        .task-item.low { border-left-color: #10b981; }
+        .task-item.flexible { border-left-color: #3b82f6; }
+        .completed { opacity: 0.6; text-decoration: line-through; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; color: white; }
+        .badge.church { background: #9333ea; }
+        .badge.weekend { background: #f97316; }
+        .badge.personal { background: #14b8a6; }
+        .badge.work { background: #6366f1; }
+        .footer { text-align: center; margin-top: 30px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Daily Task Reminder</h1>
+            <p>Hi {{ user.first_name|default:user.username }}!</p>
+        </div>
+        
+        {% if incomplete_tasks %}
+        <div class="task-section">
+            <h2>🎯 Pending Tasks ({{ incomplete_tasks|length }})</h2>
+            {% for task in incomplete_tasks %}
+            <div class="task-item {{ task.priority }}">
+                <strong>{{ task.text }}</strong>
+                <br>
+                <span class="badge {{ task.category }}">{{ task.get_category_display }}</span>
+                <span style="color: #666; font-size: 14px;">{{ task.get_priority_display }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if completed_tasks %}
+        <div class="task-section">
+            <h2>✅ Completed Tasks ({{ completed_tasks|length }})</h2>
+            {% for task in completed_tasks %}
+            <div class="task-item completed">
+                <strong>{{ task.text }}</strong>
+                <br>
+                <span class="badge {{ task.category }}">{{ task.get_category_display }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if not incomplete_tasks %}
+        <div class="task-section" style="text-align: center; padding: 40px;">
+            <h2>🎉 All Done!</h2>
+            <p>You've completed all your tasks for today. Great job!</p>
+        </div>
+        {% endif %}
+        
+        <div class="footer">
+            <p><a href="{{ site_url }}" style="color: #667eea;">Open Dashboard</a></p>
+            <p><small>You're receiving this because you enabled email reminders in your settings.</small></p>
+        </div>
+    </div>
+</body>
+</html>

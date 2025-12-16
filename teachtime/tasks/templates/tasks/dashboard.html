@@ -330,6 +330,7 @@
             <p>Designed for leaders with unpredictable schedules</p>
             <div class="user-info">
                 Logged in as: <span>{{ user.username }}</span>
+                <a href="{% url 'tasks:settings' %}" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-right: 10px; cursor: pointer; font-size: 0.9rem; text-decoration: none; display: inline-block;">⚙️ Settings</a>
                 <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
             </div>
         </div>

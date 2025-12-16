@@ -1,0 +1,26 @@
+Daily Task Reminder
+
+Hi {{ user.first_name|default:user.username }}!
+
+{% if incomplete_tasks %}
+PENDING TASKS ({{ incomplete_tasks|length }}):
+{% for task in incomplete_tasks %}
+- {{ task.text }} [{{ task.get_priority_display }} - {{ task.get_category_display }}]
+{% endfor %}
+{% endif %}
+
+{% if completed_tasks %}
+COMPLETED TASKS ({{ completed_tasks|length }}):
+{% for task in completed_tasks %}
+✓ {{ task.text }}
+{% endfor %}
+{% endif %}
+
+{% if not incomplete_tasks %}
+🎉 All Done! You've completed all your tasks for today.
+{% endif %}
+
+Open your dashboard: {{ site_url }}
+
+---
+You're receiving this because you enabled email reminders in your settings.
