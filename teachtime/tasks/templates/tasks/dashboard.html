@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Management Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .user-info span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .capacity-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .capacity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .capacity-bar {
+            background: rgba(255,255,255,0.3);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .buffer-control {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .buffer-control input[type="range"] {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .add-task-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .add-task-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .tasks-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .priority-section {
+            margin-bottom: 30px;
+        }
+
+        .priority-title {
+            color: #666;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .task-item {
+            border: 2px solid;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: start;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+        }
+
+        .task-item.completed {
+            opacity: 0.5;
+            background: #f9fafb;
+        }
+
+        .task-item.high { border-color: #ef4444; background: #fef2f2; }
+        .task-item.medium { border-color: #f59e0b; background: #fffbeb; }
+        .task-item.low { border-color: #10b981; background: #f0fdf4; }
+        .task-item.flexible { border-color: #3b82f6; background: #eff6ff; }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-text {
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .task-badges {
+            display: flex;
+            gap: 8px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge.church { background: #9333ea; }
+        .badge.weekend { background: #f97316; }
+        .badge.personal { background: #14b8a6; }
+        .badge.work { background: #6366f1; }
+
+        .task-delete {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+
+        .task-delete:hover {
+            color: #ef4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        .tips-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .tips-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .tips-card ul {
+            list-style: none;
+        }
+
+        .tips-card li {
+            color: #666;
+            padding: 8px 0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                📅 Your Flexible Day Planner
+            </h1>
+            <p>Designed for leaders with unpredictable schedules</p>
+            <div class="user-info">
+                Logged in as: <span>{{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+
+        <div class="capacity-card">
+            <div class="capacity-header">
+                <div>
+                    <h3 style="margin-bottom: 5px;">⏰ Today's Capacity</h3>
+                    <p style="font-size: 0.9rem; opacity: 0.9;">
+                        <span id="scheduled-hours">0</span>h scheduled / 
+                        <span id="available-hours">10</span>h available
+                    </p>
+                </div>
+            </div>
+            <div class="capacity-bar">
+                <div class="capacity-fill" id="capacity-fill" style="width: 0%; background: #10b981;"></div>
+            </div>
+            <div class="buffer-control">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>⚠️ Buffer Time: <strong><span id="buffer-display">{{ buffer_time }}</span>h</strong></span>
+                    <span style="font-size: 0.9rem; opacity: 0.9;">For unexpected church calls</span>
+                </div>
+                <input type="range" id="buffer-slider" min="0" max="6" step="0.5" value="{{ buffer_time }}">
+            </div>
+        </div>
+
+        <div class="add-task-card">
+            <h2>➕ Add New Task</h2>
+            <form id="add-task-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>What needs to get done?</label>
+                    <input type="text" id="task-text" placeholder="Enter task description..." required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="task-category">
+                            <option value="church">Church Leadership</option>
+                            <option value="weekend">Weekend Commitments</option>
+                            <option value="personal" selected>Personal</option>
+                            <option value="work">Work</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="task-priority">
+                            <option value="high">High Priority</option>
+                            <option value="medium" selected>Medium Priority</option>
+                            <option value="low">Low Priority</option>
+                            <option value="flexible">Flexible (Can Shift)</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Add Task</button>
+            </form>
+        </div>
+
+        <div class="tasks-container">
+            <div id="tasks-list">
+                {% if not tasks %}
+                <div class="empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <p>No tasks yet. Start planning your day above!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tips-card">
+            <h3>💡 Tips for Managing Unpredictable Days</h3>
+            <ul>
+                <li>• Mark church tasks as "Flexible" so you know what can shift when emergencies arise</li>
+                <li>• Keep buffer time at 2-3 hours for unexpected calls</li>
+                <li>• Schedule high-priority personal tasks early in the day</li>
+                <li>• Review weekend commitments on Friday to prepare mentally</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Load tasks from Django backend
+        let tasks = [
+            {% for task in tasks %}
+            {
+                id: {{ task.id }},
+                text: "{{ task.text|escapejs }}",
+                priority: "{{ task.priority }}",
+                category: "{{ task.category }}",
+                completed: {{ task.completed|yesno:"true,false" }}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Loaded tasks from database:', tasks);
+            loadTasks();
+            updateCapacity();
+        });
+
+        // Buffer time slider
+        document.getElementById('buffer-slider').addEventListener('input', function(e) {
+            const bufferTime = parseFloat(e.target.value);
+            document.getElementById('buffer-display').textContent = bufferTime;
+            updateCapacity();
+            
+            fetch("{% url 'tasks:update_buffer' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ buffer_time: bufferTime })
+            }).catch(err => console.error('Buffer update error:', err));
+        });
+
+        // Add task form
+        document.getElementById('add-task-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const text = document.getElementById('task-text').value;
+            const category = document.getElementById('task-category').value;
+            const priority = document.getElementById('task-priority').value;
+            
+            try {
+                const response = await fetch("{% url 'tasks:add_task' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({ text, category, priority })
+                });
+                
+                if (response.ok) {
+                    const task = await response.json();
+                    console.log('Task added:', task);
+                    tasks.push(task);
+                    document.getElementById('task-text').value = '';
+                    loadTasks();
+                    updateCapacity();
+                } else {
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
+                    alert('Failed to add task. Check console for details.');
+                }
+            } catch (error) {
+                console.error('Error adding task:', error);
+                alert('Error adding task: ' + error.message);
+            }
+        });
+
+        async function toggleTask(taskId) {
+            try {
+                const response = await fetch(`/toggle/${taskId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.completed = data.completed;
+                        loadTasks();
+                        updateCapacity();
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling task:', error);
+            }
+        }
+
+        async function deleteTask(taskId) {
+            try {
+                const response = await fetch(`/delete/${taskId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    }
+                });
+                
+                if (response.ok) {
+                    tasks = tasks.filter(t => t.id !== taskId);
+                    loadTasks();
+                    updateCapacity();
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+            }
+        }
+
+        function loadTasks() {
+            const tasksList = document.getElementById('tasks-list');
+            
+            if (tasks.length === 0) {
+                tasksList.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p>No tasks yet. Start planning your day above!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const priorities = {
+                high: 'High Priority',
+                medium: 'Medium Priority',
+                low: 'Low Priority',
+                flexible: 'Flexible (Can Shift)'
+            };
+
+            const categories = {
+                church: 'Church Leadership',
+                weekend: 'Weekend Commitments',
+                personal: 'Personal',
+                work: 'Work'
+            };
+
+            let html = '';
+            
+            // Group by priority
+            for (const [priorityKey, priorityLabel] of Object.entries(priorities)) {
+                const priorityTasks = tasks.filter(t => t.priority === priorityKey && !t.completed);
+                
+                if (priorityTasks.length > 0) {
+                    html += `<div class="priority-section">`;
+                    html += `<div class="priority-title">${priorityLabel}</div>`;
+                    
+                    priorityTasks.forEach(task => {
+                        html += renderTask(task, categories);
+                    });
+                    
+                    html += `</div>`;
+                }
+            }
+
+            // Completed tasks
+            const completedTasks = tasks.filter(t => t.completed);
+            if (completedTasks.length > 0) {
+                html += `<div class="priority-section" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee;">`;
+                html += `<div class="priority-title">✅ Completed</div>`;
+                completedTasks.forEach(task => {
+                    html += renderTask(task, categories);
+                });
+                html += `</div>`;
+            }
+
+            tasksList.innerHTML = html;
+        }
+
+        function renderTask(task, categories) {
+            return `
+                <div class="task-item ${task.priority} ${task.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="task-checkbox" 
+                           ${task.completed ? 'checked' : ''} 
+                           onchange="toggleTask(${task.id})">
+                    <div class="task-content">
+                        <div class="task-text ${task.completed ? 'completed' : ''}">${task.text}</div>
+                        <div class="task-badges">
+                            <span class="badge ${task.category}">${categories[task.category]}</span>
+                        </div>
+                    </div>
+                    <button class="task-delete" onclick="deleteTask(${task.id})">×</button>
+                </div>
+            `;
+        }
+
+        function updateCapacity() {
+            const bufferTime = parseFloat(document.getElementById('buffer-slider').value);
+            const activeTasks = tasks.filter(t => !t.completed);
+            const scheduledHours = activeTasks.length * 0.5;
+            const availableHours = 12 - bufferTime;
+            const capacityPercent = Math.min((scheduledHours / availableHours) * 100, 100);
+
+            document.getElementById('scheduled-hours').textContent = scheduledHours.toFixed(1);
+            document.getElementById('available-hours').textContent = availableHours.toFixed(1);
+            
+            const capacityFill = document.getElementById('capacity-fill');
+            capacityFill.style.width = capacityPercent + '%';
+            
+            if (capacityPercent > 90) {
+                capacityFill.style.background = '#ef4444';
+            } else if (capacityPercent > 70) {
+                capacityFill.style.background = '#f59e0b';
+            } else {
+                capacityFill.style.background = '#10b981';
+            }
+        }
+    </script>
+</body>
+</html>

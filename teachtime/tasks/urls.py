@@ -1,0 +1,12 @@
+from django.urls import path
+from . import views
+
+app_name = 'tasks'
+
+urlpatterns = [
+    path('', views.dashboard, name='dashboard'),
+    path('add/', views.add_task, name='add_task'),
+    path('toggle/<int:task_id>/', views.toggle_task, name='toggle_task'),
+    path('delete/<int:task_id>/', views.delete_task, name='delete_task'),
+    path('update-buffer/', views.update_buffer, name='update_buffer'),
+]
