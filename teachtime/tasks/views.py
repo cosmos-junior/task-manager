@@ -12,7 +12,7 @@ import json
 
 @login_required
 def dashboard(request):
-    tasks = Task.objects.filter(user=request.user, due_date=timezone.now().date())
+    tasks = Task.objects.filter(user=request.user)
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     
     context = {
