@@ -12,12 +12,26 @@ import json
 
 @login_required
 def dashboard(request):
-    tasks = Task.objects.filter(user=request.user)
+    # Get today's date
+    today = timezone.now().date()
+    
+    # Get incomplete tasks for today
+    tasks = Task.objects.filter(user=request.user, completed=False, due_date=today)
+    
+    # Check if all tasks are completed
+    total_tasks_today = Task.objects.filter(user=request.user, due_date=today).count()
+    completed_tasks_today = Task.objects.filter(user=request.user, due_date=today, completed=True).count()
+    
+    all_tasks_completed = total_tasks_today > 0 and completed_tasks_today == total_tasks_today
+    
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     
     context = {
         'tasks': tasks,
         'buffer_time': profile.buffer_time,
+        'all_tasks_completed': all_tasks_completed,
+        'completed_count': completed_tasks_today,
+        'total_count': total_tasks_today,
     }
     return render(request, 'tasks/dashboard.html', context)
 

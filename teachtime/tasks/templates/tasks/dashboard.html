@@ -391,12 +391,26 @@
 
         <div class="tasks-container">
             <div id="tasks-list">
-                {% if not tasks %}
+                {% if all_tasks_completed %}
+                <div class="completion-celebration">
+                    <div style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 15px; margin-bottom: 20px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+                        <h2 style="font-size: 2rem; margin-bottom: 15px;">Congratulations!</h2>
+                        <p style="font-size: 1.2rem; margin-bottom: 20px;">You've completed all {{ total_count }} task{{ total_count|pluralize }} for today!</p>
+                        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h3 style="margin-bottom: 10px;">💪 Beat Procrastination!</h3>
+                            <p>"Success is the sum of small efforts repeated day in and day out." - Robert Collier</p>
+                            <p style="margin-top: 10px;">You've proven that consistency beats laziness. Keep this momentum going!</p>
+                        </div>
+                        <button onclick="location.reload()" style="background: white; color: #10b981; border: none; padding: 15px 30px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px;">Plan Tomorrow's Tasks</button>
+                    </div>
+                </div>
+                {% elif not tasks %}
                 <div class="empty-state">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                    <p>No tasks yet. Start planning your day above!</p>
+                    <p>No tasks for today. Start planning your day above!</p>
                 </div>
                 {% endif %}
             </div>
@@ -533,13 +547,36 @@
         function loadTasks() {
             const tasksList = document.getElementById('tasks-list');
             
-            if (tasks.length === 0) {
+            // Check if all tasks are completed
+            const incompleteTasks = tasks.filter(t => !t.completed);
+            
+            if (tasks.length > 0 && incompleteTasks.length === 0) {
+                // All tasks completed - show celebration
+                tasksList.innerHTML = `
+                    <div class="completion-celebration">
+                        <div style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 15px; margin-bottom: 20px;">
+                            <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+                            <h2 style="font-size: 2rem; margin-bottom: 15px;">Amazing Work!</h2>
+                            <p style="font-size: 1.2rem; margin-bottom: 20px;">You've completed all ${tasks.length} task${tasks.length > 1 ? 's' : ''} for today!</p>
+                            <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                                <h3 style="margin-bottom: 10px;">💪 Defeat Procrastination!</h3>
+                                <p>"The way to get started is to quit talking and begin doing." - Walt Disney</p>
+                                <p style="margin-top: 10px;">You chose action over laziness today. Tomorrow, do it again!</p>
+                            </div>
+                            <button onclick="location.reload()" style="background: white; color: #10b981; border: none; padding: 15px 30px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 20px;">Plan Tomorrow</button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (incompleteTasks.length === 0) {
                 tasksList.innerHTML = `
                     <div class="empty-state">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
-                        <p>No tasks yet. Start planning your day above!</p>
+                        <p>No tasks for today. Start planning your day above!</p>
                     </div>
                 `;
                 return;
@@ -561,9 +598,9 @@
 
             let html = '';
             
-            // Group by priority
+            // Group by priority - only show incomplete tasks
             for (const [priorityKey, priorityLabel] of Object.entries(priorities)) {
-                const priorityTasks = tasks.filter(t => t.priority === priorityKey && !t.completed);
+                const priorityTasks = incompleteTasks.filter(t => t.priority === priorityKey);
                 
                 if (priorityTasks.length > 0) {
                     html += `<div class="priority-section">`;
@@ -575,17 +612,6 @@
                     
                     html += `</div>`;
                 }
-            }
-
-            // Completed tasks
-            const completedTasks = tasks.filter(t => t.completed);
-            if (completedTasks.length > 0) {
-                html += `<div class="priority-section" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee;">`;
-                html += `<div class="priority-title">✅ Completed</div>`;
-                completedTasks.forEach(task => {
-                    html += renderTask(task, categories);
-                });
-                html += `</div>`;
             }
 
             tasksList.innerHTML = html;
